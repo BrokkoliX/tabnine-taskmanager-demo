@@ -1,14 +1,33 @@
+using Microsoft.EntityFrameworkCore;
 using TaskManager.Api.Data;
 using TaskManager.Api.Models;
 using TaskManager.Api.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Register DbContext with SQLite
+builder.Services.AddDbContext<TaskDbContext>(options =>
+    options.UseSqlite(builder.Configuration.GetConnectionString("TaskDatabase")));
+
 // Register services
-builder.Services.AddSingleton<ITaskRepository, InMemoryTaskRepository>();
+builder.Services.AddScoped<ITaskRepository, SqliteTaskRepository>();
 builder.Services.AddScoped<ITaskService, TaskService>();
 
+// Swagger
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
+
 var app = builder.Build();
+
+// Swagger middleware
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI(c =>
+    {
+        c.SwaggerEndpoint("/swagger/v1/swagger.json", "Task Manager API v1");
+    });
+}
 
 app.MapGet("/", () => "Task Manager API for Tabnine demo");
 

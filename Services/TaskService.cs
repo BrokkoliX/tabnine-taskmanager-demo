@@ -29,7 +29,7 @@ public class TaskService : ITaskService
 
         if (onlyIncomplete)
         {
-            tasks = tasks.Where(t => !t.IsCompleted);
+            tasks = tasks.Where(t => t.Status != "Completed");
         }
 
         return tasks;
@@ -58,7 +58,9 @@ public class TaskService : ITaskService
 
         existing.Title = task.Title;
         existing.Description = task.Description;
-        existing.IsCompleted = task.IsCompleted;
+        existing.Status = task.Status;
+        existing.Priority = task.Priority;
+        existing.DueDate = task.DueDate;
 
         return await _repository.UpdateAsync(existing);
     }

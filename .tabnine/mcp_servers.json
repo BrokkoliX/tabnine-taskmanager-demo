@@ -1,0 +1,20 @@
+{
+  "mcpServers": {
+    "demo-sqlite": {
+      "command": "python3",
+      "args": ["/Users/robbie/Tab/TabnineTaskDemo/TaskManager.Api/tools/mcp_sqlite_server.py"],
+      "env": {
+        "DB_PATH": "/Users/robbie/Tab/TabnineTaskDemo/TaskManager.Api/data/taskdemo.db"
+      }
+    },
+    "git": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "mcp-git",
+        "--repository",
+        "/Users/robbie/Tab/TabnineTaskDemo/TaskManager.Api"
+      ]
+    }
+  }
+}
