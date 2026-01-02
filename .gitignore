@@ -4,3 +4,23 @@ obj/
 .idea/
 *.user
 *.suo
+
+# SQLite Database
+*.db
+*.db-shm
+*.db-wal
+
+# Node.js (MCP Server)
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+package-lock.json
+
+# Environment
+.env
+.env.local
+
+# OS
+.DS_Store
+Thumbs.db

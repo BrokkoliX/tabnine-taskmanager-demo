@@ -1,14 +1,27 @@
+using Microsoft.EntityFrameworkCore;
 using TaskManager.Api.Data;
 using TaskManager.Api.Models;
 using TaskManager.Api.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Register DbContext with SQLite
+builder.Services.AddDbContext<TaskDbContext>(options =>
+    options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection") 
+        ?? "Data Source=taskmanager.db"));
+
 // Register services
-builder.Services.AddSingleton<ITaskRepository, InMemoryTaskRepository>();
+builder.Services.AddScoped<ITaskRepository, SqliteTaskRepository>();
 builder.Services.AddScoped<ITaskService, TaskService>();
 
 var app = builder.Build();
+
+// Ensure database is created
+using (var scope = app.Services.CreateScope())
+{
+    var dbContext = scope.ServiceProvider.GetRequiredService<TaskDbContext>();
+    dbContext.Database.EnsureCreated();
+}
 
 app.MapGet("/", () => "Task Manager API for Tabnine demo");
 

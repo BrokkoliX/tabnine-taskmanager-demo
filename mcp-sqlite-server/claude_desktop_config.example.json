@@ -1,0 +1,10 @@
+{
+  "mcpServers": {
+    "sqlite-taskmanager": {
+      "command": "node",
+      "args": [
+        "/Users/robbie/Tab/TabnineTaskDemo/TaskManager.Api/mcp-sqlite-server/index.js"
+      ]
+    }
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "name": "mcp-sqlite-server",
+  "version": "1.0.0",
+  "description": "MCP Server for SQLite database access",
+  "type": "module",
+  "main": "index.js",
+  "bin": {
+    "mcp-sqlite-server": "./index.js"
+  },
+  "scripts": {
+    "start": "node index.js",
+    "dev": "node --watch index.js",
+    "test": "node test-server.js"
+  },
+  "keywords": ["mcp", "sqlite", "database", "model-context-protocol"],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.25.1",
+    "better-sqlite3": "^12.5.0",
+    "zod": "^4.3.4"
+  }
+}
