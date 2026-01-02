@@ -23,7 +23,9 @@ using (var scope = app.Services.CreateScope())
     dbContext.Database.EnsureCreated();
 }
 
-app.MapGet("/", () => "Task Manager API for Tabnine demo");
+// Serve static files from wwwroot
+app.UseDefaultFiles();
+app.UseStaticFiles();
 
 // Get all tasks
 app.MapGet("/tasks", async (ITaskService service) =>
