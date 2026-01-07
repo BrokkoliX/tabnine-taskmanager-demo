@@ -44,6 +44,11 @@ public class SqliteTaskRepository : ITaskRepository
         existing.Title = task.Title;
         existing.Description = task.Description;
         existing.IsCompleted = task.IsCompleted;
+        existing.Assignee = task.Assignee;
+        existing.Priority = task.Priority;
+        existing.DueDate = task.DueDate;
+        existing.Category = task.Category;
+        // Note: CreatedAt should not be updated
 
         await _context.SaveChangesAsync();
         

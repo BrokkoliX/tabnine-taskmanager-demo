@@ -38,6 +38,11 @@ A complete Task Manager application built with ASP.NET Core 9.0, featuring:
   - `Title` (string, required) - Task title
   - `Description` (string?, optional) - Task description
   - `IsCompleted` (bool) - Completion status
+  - `Assignee` (string?, optional) - Task assignee
+  - `Priority` (enum, required) - Priority level (Low=0, Medium=1, High=2)
+  - `DueDate` (DateTime?, optional) - Task due date
+  - `Category` (string?, optional) - Task category/tag
+  - `CreatedAt` (DateTime, required) - Creation timestamp
 
 **Files:**
 - `Models/TaskItem.cs`
@@ -364,9 +369,8 @@ curl "http://localhost:5050/tasks/search?query=test&onlyIncomplete=false"
 5. **No Validation** - Minimal input validation on API
 6. **Single User** - No multi-user support
 7. **No Pagination** - All tasks loaded at once
-8. **No Task Categories** - Tasks don't have categories/tags
-9. **No Due Dates** - No date tracking for tasks
-10. **No Priority** - No task priority system
+8. **No Advanced Filtering** - Can't filter by priority, category, or assignee yet
+9. **No Advanced Sorting** - Can't sort by due date, priority, or created date yet
 
 ### Resolved Issues
 - ✅ Root path conflict (removed MapGet("/"))
@@ -377,20 +381,27 @@ curl "http://localhost:5050/tasks/search?query=test&onlyIncomplete=false"
 
 ## 🔮 Future Enhancement Ideas
 
+### Recently Completed ✅
+- [x] Add task categories/tags
+- [x] Add due dates for tasks
+- [x] Add priority levels (high, medium, low)
+- [x] Add task assignee field
+- [x] Add created date tracking
+
 ### High Priority
 - [ ] Add input validation on server side
 - [ ] Add Swagger/OpenAPI documentation
 - [ ] Implement proper logging (Serilog)
 - [ ] Add pagination for task list
-- [ ] Add sorting options (by date, title, status)
+- [ ] Add filtering by priority, category, assignee
+- [ ] Add sorting options (by date, title, status, priority, due date)
 
 ### Medium Priority
-- [ ] Add task categories/tags
-- [ ] Add due dates for tasks
-- [ ] Add priority levels (high, medium, low)
+- [ ] Add advanced search (include new fields)
 - [ ] Add task notes/comments
 - [ ] Add bulk operations (delete multiple, mark multiple complete)
 - [ ] Add export functionality (JSON, CSV)
+- [ ] Add overdue task notifications
 
 ### Low Priority
 - [ ] Add user authentication (ASP.NET Identity)
@@ -551,6 +562,46 @@ Then open: `http://localhost:5050/`
 - Fixed static file serving issues
 - Committed and pushed to GitHub
 - Created comprehensive documentation
+
+---
+
+## 📝 Latest Changes (Field Additions - January 2025)
+
+### What Was Added
+- ✅ **Assignee Field** - Track who is responsible for each task
+- ✅ **Priority System** - Low, Medium, High priority levels with color-coded badges
+- ✅ **Due Dates** - Set deadlines with overdue detection
+- ✅ **Categories** - Organize tasks with tags/categories
+- ✅ **Created Timestamp** - Auto-track when tasks are created
+
+### Files Modified
+**Backend:**
+- `Models/TaskItem.cs` - Added Priority enum and 5 new properties
+- `Data/TaskDbContext.cs` - Added EF configuration for new fields
+- `Data/SqliteTaskRepository.cs` - Updated UpdateAsync to handle new fields
+
+**Frontend:**
+- `wwwroot/index.html` - Added new form fields to Add and Edit forms
+- `wwwroot/styles.css` - Added form-row layout, priority badges, metadata styling
+- `wwwroot/app.js` - Updated all CRUD operations to handle new fields
+
+**Documentation:**
+- `FIELD_ADDITIONS.md` - Comprehensive guide for new fields
+- `TEST_NEW_FIELDS.md` - Testing guide for new functionality
+- `PROJECT_STATUS.md` - Updated project status
+
+### Database Migration
+- Database schema updated (required deleting old taskmanager.db)
+- Backup created as taskmanager.db.backup
+- New database auto-created on next run with updated schema
+
+### UI Enhancements
+- Two-column form layout for new fields (desktop)
+- Responsive single-column layout (mobile)
+- Metadata section in task cards with icons
+- Color-coded priority badges (green/orange/red)
+- Overdue indicator for past-due incomplete tasks
+- Created date display
 
 ---
 

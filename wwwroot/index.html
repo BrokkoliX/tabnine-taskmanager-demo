@@ -32,6 +32,40 @@
                         rows="3"
                     ></textarea>
                 </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <input 
+                            type="text" 
+                            id="taskAssignee" 
+                            placeholder="Assignee (optional)"
+                            autocomplete="off"
+                        >
+                    </div>
+                    <div class="form-group">
+                        <select id="taskPriority">
+                            <option value="0">Low Priority</option>
+                            <option value="1" selected>Medium Priority</option>
+                            <option value="2">High Priority</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <input 
+                            type="date" 
+                            id="taskDueDate" 
+                            placeholder="Due Date (optional)"
+                        >
+                    </div>
+                    <div class="form-group">
+                        <input 
+                            type="text" 
+                            id="taskCategory" 
+                            placeholder="Category (optional)"
+                            autocomplete="off"
+                        >
+                    </div>
+                </div>
                 <button type="submit" class="btn btn-primary">
                     <span>➕</span> Add Task
                 </button>
@@ -53,6 +87,7 @@
                 </label>
                 <button id="searchBtn" class="btn btn-secondary">🔍 Search</button>
                 <button id="clearSearchBtn" class="btn btn-secondary">✖️ Clear</button>
+                <button id="exportBtn" class="btn btn-success">📊 Export to Excel</button>
             </div>
         </div>
 
@@ -91,6 +126,41 @@
                         id="editTaskDescription" 
                         rows="3"
                     ></textarea>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="editTaskAssignee">Assignee</label>
+                        <input 
+                            type="text" 
+                            id="editTaskAssignee" 
+                            autocomplete="off"
+                        >
+                    </div>
+                    <div class="form-group">
+                        <label for="editTaskPriority">Priority</label>
+                        <select id="editTaskPriority">
+                            <option value="0">Low Priority</option>
+                            <option value="1">Medium Priority</option>
+                            <option value="2">High Priority</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="editTaskDueDate">Due Date</label>
+                        <input 
+                            type="date" 
+                            id="editTaskDueDate"
+                        >
+                    </div>
+                    <div class="form-group">
+                        <label for="editTaskCategory">Category</label>
+                        <input 
+                            type="text" 
+                            id="editTaskCategory" 
+                            autocomplete="off"
+                        >
+                    </div>
                 </div>
                 <div class="form-group">
                     <label class="checkbox-label">

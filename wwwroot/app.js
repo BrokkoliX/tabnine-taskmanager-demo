@@ -10,6 +10,7 @@ const searchQuery = document.getElementById('searchQuery');
 const onlyIncomplete = document.getElementById('onlyIncomplete');
 const searchBtn = document.getElementById('searchBtn');
 const clearSearchBtn = document.getElementById('clearSearchBtn');
+const exportBtn = document.getElementById('exportBtn');
 const taskCount = document.getElementById('taskCount');
 const editModal = document.getElementById('editModal');
 const editForm = document.getElementById('editForm');
@@ -17,6 +18,16 @@ const editTaskId = document.getElementById('editTaskId');
 const editTaskTitle = document.getElementById('editTaskTitle');
 const editTaskDescription = document.getElementById('editTaskDescription');
 const editTaskCompleted = document.getElementById('editTaskCompleted');
+
+// New field elements
+const taskAssignee = document.getElementById('taskAssignee');
+const taskPriority = document.getElementById('taskPriority');
+const taskDueDate = document.getElementById('taskDueDate');
+const taskCategory = document.getElementById('taskCategory');
+const editTaskAssignee = document.getElementById('editTaskAssignee');
+const editTaskPriority = document.getElementById('editTaskPriority');
+const editTaskDueDate = document.getElementById('editTaskDueDate');
+const editTaskCategory = document.getElementById('editTaskCategory');
 
 // Initialize app
 document.addEventListener('DOMContentLoaded', () => {
@@ -30,6 +41,7 @@ function attachEventListeners() {
     editForm.addEventListener('submit', handleEditTask);
     searchBtn.addEventListener('click', handleSearch);
     clearSearchBtn.addEventListener('click', handleClearSearch);
+    exportBtn.addEventListener('click', handleExport);
     
     // Allow Enter key in search
     searchQuery.addEventListener('keypress', (e) => {
@@ -98,12 +110,35 @@ function handleClearSearch() {
     loadTasks();
 }
 
+// Handle export to Excel
+function handleExport() {
+    const query = searchQuery.value.trim();
+    const incomplete = onlyIncomplete.checked;
+    
+    // Build export URL with current filters
+    let url = `${API_BASE}/export?onlyIncomplete=${incomplete}`;
+    
+    if (query) {
+        url += `&query=${encodeURIComponent(query)}`;
+    }
+    
+    // Trigger download
+    window.location.href = url;
+    
+    // Show success message
+    showSuccessMessage('Exporting tasks to Excel...');
+}
+
 // Handle add task
 async function handleAddTask(e) {
     e.preventDefault();
     
     const title = taskTitle.value.trim();
     const description = taskDescription.value.trim();
+    const assignee = taskAssignee.value.trim();
+    const priority = parseInt(taskPriority.value);
+    const dueDate = taskDueDate.value;
+    const category = taskCategory.value.trim();
     
     if (!title) {
         alert('Please enter a task title');
@@ -113,7 +148,11 @@ async function handleAddTask(e) {
     const newTask = {
         title: title,
         description: description || null,
-        isCompleted: false
+        isCompleted: false,
+        assignee: assignee || null,
+        priority: priority,
+        dueDate: dueDate || null,
+        category: category || null
     };
     
     try {
@@ -151,6 +190,10 @@ async function handleEditTask(e) {
     const title = editTaskTitle.value.trim();
     const description = editTaskDescription.value.trim();
     const isCompleted = editTaskCompleted.checked;
+    const assignee = editTaskAssignee.value.trim();
+    const priority = parseInt(editTaskPriority.value);
+    const dueDate = editTaskDueDate.value;
+    const category = editTaskCategory.value.trim();
     
     if (!title) {
         alert('Please enter a task title');
@@ -161,7 +204,11 @@ async function handleEditTask(e) {
         id: id,
         title: title,
         description: description || null,
-        isCompleted: isCompleted
+        isCompleted: isCompleted,
+        assignee: assignee || null,
+        priority: priority,
+        dueDate: dueDate || null,
+        category: category || null
     };
     
     try {
@@ -223,6 +270,10 @@ function openEditModal(task) {
     editTaskTitle.value = task.title;
     editTaskDescription.value = task.description || '';
     editTaskCompleted.checked = task.isCompleted;
+    editTaskAssignee.value = task.assignee || '';
+    editTaskPriority.value = task.priority || 1;
+    editTaskDueDate.value = task.dueDate ? task.dueDate.split('T')[0] : '';
+    editTaskCategory.value = task.category || '';
     editModal.classList.add('show');
 }
 
@@ -238,7 +289,11 @@ async function toggleComplete(task) {
         id: task.id,
         title: task.title,
         description: task.description,
-        isCompleted: !task.isCompleted
+        isCompleted: !task.isCompleted,
+        assignee: task.assignee,
+        priority: task.priority,
+        dueDate: task.dueDate,
+        category: task.category
     };
     
     try {
@@ -271,7 +326,32 @@ function displayTasks(tasks) {
         return;
     }
     
-    tasksList.innerHTML = tasks.map(task => `
+    tasksList.innerHTML = tasks.map(task => {
+        const metadata = [];
+        if (task.assignee) metadata.push(`<span class="task-meta-item">👤 ${escapeHtml(task.assignee)}</span>`);
+        if (task.category) metadata.push(`<span class="task-meta-item">🏷️ ${escapeHtml(task.category)}</span>`);
+        
+        const priorityLabels = ['Low', 'Medium', 'High'];
+        const priorityClasses = ['priority-low', 'priority-medium', 'priority-high'];
+        const priorityLabel = priorityLabels[task.priority] || 'Medium';
+        const priorityClass = priorityClasses[task.priority] || 'priority-medium';
+        metadata.push(`<span class="task-meta-item ${priorityClass}">⚡ ${priorityLabel}</span>`);
+        
+        if (task.dueDate) {
+            const dueDate = new Date(task.dueDate);
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            const isOverdue = dueDate < today && !task.isCompleted;
+            const dueDateStr = dueDate.toLocaleDateString();
+            metadata.push(`<span class="task-meta-item ${isOverdue ? 'overdue' : ''}">📅 ${dueDateStr}${isOverdue ? ' (Overdue)' : ''}</span>`);
+        }
+        
+        if (task.createdAt) {
+            const createdDate = new Date(task.createdAt).toLocaleDateString();
+            metadata.push(`<span class="task-meta-item">🕒 Created: ${createdDate}</span>`);
+        }
+        
+        return `
         <div class="task-item ${task.isCompleted ? 'completed' : ''}">
             <div class="task-header">
                 <div class="task-title">${escapeHtml(task.title)}</div>
@@ -280,6 +360,7 @@ function displayTasks(tasks) {
                 </span>
             </div>
             ${task.description ? `<div class="task-description">${escapeHtml(task.description)}</div>` : ''}
+            ${metadata.length > 0 ? `<div class="task-metadata">${metadata.join('')}</div>` : ''}
             <div class="task-footer">
                 <span class="task-id">ID: ${task.id}</span>
                 <div class="task-actions">
@@ -295,7 +376,8 @@ function displayTasks(tasks) {
                 </div>
             </div>
         </div>
-    `).join('');
+        `;
+    }).join('');
 }
 
 // Show loading state

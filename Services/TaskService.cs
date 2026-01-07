@@ -1,3 +1,4 @@
+using OfficeOpenXml;
 using TaskManager.Api.Data;
 using TaskManager.Api.Models;
 
@@ -64,4 +65,57 @@ public class TaskService : ITaskService
     }
 
     public Task<bool> DeleteAsync(int id) => _repository.DeleteAsync(id);
+
+    public async Task<byte[]> ExportToExcelAsync(string? query = null, bool onlyIncomplete = false)
+    {
+        // Set EPPlus license context (required for non-commercial use)
+        ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+
+        var tasks = await SearchAsync(query, onlyIncomplete);
+
+        using var package = new ExcelPackage();
+        var worksheet = package.Workbook.Worksheets.Add("Tasks");
+
+        // Add headers
+        worksheet.Cells[1, 1].Value = "ID";
+        worksheet.Cells[1, 2].Value = "Title";
+        worksheet.Cells[1, 3].Value = "Description";
+        worksheet.Cells[1, 4].Value = "Status";
+        worksheet.Cells[1, 5].Value = "Assignee";
+        worksheet.Cells[1, 6].Value = "Priority";
+        worksheet.Cells[1, 7].Value = "Due Date";
+        worksheet.Cells[1, 8].Value = "Category";
+        worksheet.Cells[1, 9].Value = "Created At";
+
+        // Style headers
+        using (var range = worksheet.Cells[1, 1, 1, 9])
+        {
+            range.Style.Font.Bold = true;
+            range.Style.Fill.PatternType = OfficeOpenXml.Style.ExcelFillStyle.Solid;
+            range.Style.Fill.BackgroundColor.SetColor(System.Drawing.Color.LightGray);
+            range.Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Center;
+        }
+
+        // Add data
+        int row = 2;
+        foreach (var task in tasks)
+        {
+            worksheet.Cells[row, 1].Value = task.Id;
+            worksheet.Cells[row, 2].Value = task.Title;
+            worksheet.Cells[row, 3].Value = task.Description ?? string.Empty;
+            worksheet.Cells[row, 4].Value = task.IsCompleted ? "Completed" : "Pending";
+            worksheet.Cells[row, 5].Value = task.Assignee ?? string.Empty;
+            worksheet.Cells[row, 6].Value = task.Priority.ToString();
+            worksheet.Cells[row, 7].Value = task.DueDate?.ToString("yyyy-MM-dd") ?? string.Empty;
+            worksheet.Cells[row, 8].Value = task.Category ?? string.Empty;
+            worksheet.Cells[row, 9].Value = task.CreatedAt.ToString("yyyy-MM-dd HH:mm:ss");
+            row++;
+        }
+
+        // Auto-fit columns
+        worksheet.Cells[worksheet.Dimension.Address].AutoFitColumns();
+
+        // Return as byte array
+        return package.GetAsByteArray();
+    }
 }

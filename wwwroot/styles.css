@@ -61,7 +61,16 @@ h2 {
     color: #555;
 }
 
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+    margin-bottom: 15px;
+}
+
 input[type="text"],
+input[type="date"],
+select,
 textarea {
     width: 100%;
     padding: 12px;
@@ -73,6 +82,8 @@ textarea {
 }
 
 input[type="text"]:focus,
+input[type="date"]:focus,
+select:focus,
 textarea:focus {
     outline: none;
     border-color: #667eea;
@@ -113,6 +124,17 @@ textarea {
 
 .btn-secondary:hover {
     background: #5a6268;
+}
+
+.btn-success {
+    background: #28a745;
+    color: white;
+}
+
+.btn-success:hover {
+    background: #218838;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(40, 167, 69, 0.4);
 }
 
 .btn-danger {
@@ -250,6 +272,48 @@ textarea {
     line-height: 1.5;
 }
 
+.task-metadata {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 15px;
+    font-size: 0.9rem;
+}
+
+.task-meta-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 10px;
+    background: #f0f0f0;
+    border-radius: 12px;
+    color: #555;
+}
+
+.task-meta-item.priority-high {
+    background: #ffebee;
+    color: #c62828;
+    font-weight: 600;
+}
+
+.task-meta-item.priority-medium {
+    background: #fff3e0;
+    color: #e65100;
+    font-weight: 600;
+}
+
+.task-meta-item.priority-low {
+    background: #e8f5e9;
+    color: #2e7d32;
+    font-weight: 600;
+}
+
+.task-meta-item.overdue {
+    background: #ffcdd2;
+    color: #d32f2f;
+    font-weight: 600;
+}
+
 .task-actions {
     display: flex;
     gap: 10px;
@@ -369,6 +433,10 @@ textarea {
 @media (max-width: 768px) {
     header h1 {
         font-size: 2rem;
+    }
+
+    .form-row {
+        grid-template-columns: 1fr;
     }
 
     .search-controls {

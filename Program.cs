@@ -41,6 +41,14 @@ app.MapGet("/tasks/search", async (string? query, bool onlyIncomplete, ITaskServ
     return Results.Ok(tasks);
 });
 
+// Export tasks to Excel
+app.MapGet("/tasks/export", async (string? query, bool onlyIncomplete, ITaskService service) =>
+{
+    var excelData = await service.ExportToExcelAsync(query, onlyIncomplete);
+    var fileName = $"tasks_export_{DateTime.UtcNow:yyyyMMdd_HHmmss}.xlsx";
+    return Results.File(excelData, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", fileName);
+});
+
 // Get a single task
 app.MapGet("/tasks/{id:int}", async (int id, ITaskService service) =>
 {

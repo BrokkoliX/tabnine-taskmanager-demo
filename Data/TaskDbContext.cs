@@ -21,6 +21,11 @@ public class TaskDbContext : DbContext
             entity.Property(e => e.Title).IsRequired();
             entity.Property(e => e.Description);
             entity.Property(e => e.IsCompleted).IsRequired();
+            entity.Property(e => e.Assignee);
+            entity.Property(e => e.Priority).IsRequired();
+            entity.Property(e => e.DueDate);
+            entity.Property(e => e.Category);
+            entity.Property(e => e.CreatedAt).IsRequired();
         });
     }
 }
