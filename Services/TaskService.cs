@@ -104,7 +104,7 @@ public class TaskService : ITaskService
             worksheet.Cells[row, 2].Value = task.Title;
             worksheet.Cells[row, 3].Value = task.Description ?? string.Empty;
             worksheet.Cells[row, 4].Value = task.IsCompleted ? "Completed" : "Pending";
-            worksheet.Cells[row, 5].Value = task.Assignee ?? string.Empty;
+            worksheet.Cells[row, 5].Value = task.Assignee?.Name ?? string.Empty;
             worksheet.Cells[row, 6].Value = task.Priority.ToString();
             worksheet.Cells[row, 7].Value = task.DueDate?.ToString("yyyy-MM-dd") ?? string.Empty;
             worksheet.Cells[row, 8].Value = task.Category ?? string.Empty;
@@ -117,5 +117,47 @@ public class TaskService : ITaskService
 
         // Return as byte array
         return package.GetAsByteArray();
+    }
+
+    public async Task<byte[]> ExportToCsvAsync(string? query = null, bool onlyIncomplete = false)
+    {
+        var tasks = await SearchAsync(query, onlyIncomplete);
+
+        var csv = new System.Text.StringBuilder();
+
+        // Add headers
+        csv.AppendLine("ID,Title,Description,Status,Assignee,Priority,Due Date,Category,Created At");
+
+        // Add data rows
+        foreach (var task in tasks)
+        {
+            csv.AppendLine(string.Join(",",
+                EscapeCsvValue(task.Id.ToString()),
+                EscapeCsvValue(task.Title ?? string.Empty),
+                EscapeCsvValue(task.Description ?? string.Empty),
+                EscapeCsvValue(task.IsCompleted ? "Completed" : "Pending"),
+                EscapeCsvValue(task.Assignee?.Name ?? string.Empty),
+                EscapeCsvValue(task.Priority.ToString()),
+                EscapeCsvValue(task.DueDate?.ToString("yyyy-MM-dd") ?? string.Empty),
+                EscapeCsvValue(task.Category ?? string.Empty),
+                EscapeCsvValue(task.CreatedAt.ToString("yyyy-MM-dd HH:mm:ss"))
+            ));
+        }
+
+        return System.Text.Encoding.UTF8.GetBytes(csv.ToString());
+    }
+
+    private static string EscapeCsvValue(string value)
+    {
+        if (string.IsNullOrEmpty(value))
+            return string.Empty;
+
+        // If the value contains comma, quote, or newline, wrap it in quotes and escape internal quotes
+        if (value.Contains(',') || value.Contains('"') || value.Contains('\n') || value.Contains('\r'))
+        {
+            return $"\"{value.Replace("\"", "\"\"")}\"";
+        }
+
+        return value;
     }
 }

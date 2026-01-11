@@ -11,4 +11,5 @@ public interface ITaskService
     Task<TaskItem?> UpdateAsync(int id, TaskItem task);
     Task<bool> DeleteAsync(int id);
     Task<byte[]> ExportToExcelAsync(string? query = null, bool onlyIncomplete = false);
+    Task<byte[]> ExportToCsvAsync(string? query = null, bool onlyIncomplete = false);
 }

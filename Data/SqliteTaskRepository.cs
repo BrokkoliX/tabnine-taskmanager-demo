@@ -14,12 +14,16 @@ public class SqliteTaskRepository : ITaskRepository
 
     public async Task<IEnumerable<TaskItem>> GetAllAsync()
     {
-        return await _context.Tasks.ToListAsync();
+        return await _context.Tasks
+            .Include(t => t.Assignee)
+            .ToListAsync();
     }
 
     public async Task<TaskItem?> GetByIdAsync(int id)
     {
-        return await _context.Tasks.FindAsync(id);
+        return await _context.Tasks
+            .Include(t => t.Assignee)
+            .FirstOrDefaultAsync(t => t.Id == id);
     }
 
     public async Task<TaskItem> AddAsync(TaskItem task)
@@ -30,12 +34,21 @@ public class SqliteTaskRepository : ITaskRepository
         _context.Tasks.Add(task);
         await _context.SaveChangesAsync();
         
+        // Reload to get the Assignee navigation property
+        if (task.AssigneeId.HasValue)
+        {
+            await _context.Entry(task).Reference(t => t.Assignee).LoadAsync();
+        }
+        
         return task;
     }
 
     public async Task<TaskItem?> UpdateAsync(TaskItem task)
     {
-        var existing = await _context.Tasks.FindAsync(task.Id);
+        var existing = await _context.Tasks
+            .Include(t => t.Assignee)
+            .FirstOrDefaultAsync(t => t.Id == task.Id);
+        
         if (existing == null)
         {
             return null;
@@ -44,13 +57,16 @@ public class SqliteTaskRepository : ITaskRepository
         existing.Title = task.Title;
         existing.Description = task.Description;
         existing.IsCompleted = task.IsCompleted;
-        existing.Assignee = task.Assignee;
+        existing.AssigneeId = task.AssigneeId;
         existing.Priority = task.Priority;
         existing.DueDate = task.DueDate;
         existing.Category = task.Category;
         // Note: CreatedAt should not be updated
 
         await _context.SaveChangesAsync();
+        
+        // Reload to get the updated Assignee navigation property
+        await _context.Entry(existing).Reference(t => t.Assignee).LoadAsync();
         
         return existing;
     }

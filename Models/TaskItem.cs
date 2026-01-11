@@ -17,7 +17,11 @@ public class TaskItem
 
     public bool IsCompleted { get; set; }
 
-    public string? Assignee { get; set; }
+    // Foreign key to User
+    public int? AssigneeId { get; set; }
+
+    // Navigation property
+    public User? Assignee { get; set; }
 
     public Priority Priority { get; set; } = Priority.Medium;
 

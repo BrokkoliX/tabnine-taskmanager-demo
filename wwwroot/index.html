@@ -7,11 +7,32 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <div class="container">
-        <header>
+    <!-- Sidebar Navigation -->
+    <nav class="sidebar">
+        <div class="sidebar-header">
             <h1>📋 Task Manager</h1>
-            <p class="subtitle">Manage your tasks efficiently</p>
-        </header>
+        </div>
+        <ul class="sidebar-menu">
+            <li class="menu-item active" data-view="tasks">
+                <span class="menu-icon">✓</span>
+                <span class="menu-text">Tasks</span>
+            </li>
+            <li class="menu-item" data-view="users">
+                <span class="menu-icon">👥</span>
+                <span class="menu-text">Users</span>
+            </li>
+        </ul>
+    </nav>
+
+    <!-- Main Content Area -->
+    <div class="main-content">
+        <!-- Tasks View -->
+        <div id="tasksView" class="view active">
+            <div class="container">
+                <header>
+                    <h1>📋 Tasks</h1>
+                    <p class="subtitle">Manage your tasks efficiently</p>
+                </header>
 
         <div class="add-task-section">
             <h2>Add New Task</h2>
@@ -34,12 +55,9 @@
                 </div>
                 <div class="form-row">
                     <div class="form-group">
-                        <input 
-                            type="text" 
-                            id="taskAssignee" 
-                            placeholder="Assignee (optional)"
-                            autocomplete="off"
-                        >
+                        <select id="taskAssignee">
+                            <option value="">-- No Assignee --</option>
+                        </select>
                     </div>
                     <div class="form-group">
                         <select id="taskPriority">
@@ -88,6 +106,7 @@
                 <button id="searchBtn" class="btn btn-secondary">🔍 Search</button>
                 <button id="clearSearchBtn" class="btn btn-secondary">✖️ Clear</button>
                 <button id="exportBtn" class="btn btn-success">📊 Export to Excel</button>
+                <button id="exportCsvBtn" class="btn btn-success">📄 Export to CSV</button>
             </div>
         </div>
 
@@ -100,9 +119,88 @@
                 <div class="loading">Loading tasks...</div>
             </div>
         </div>
+            </div>
+        </div>
+        <!-- End Tasks View -->
+
+        <!-- Users View -->
+        <div id="usersView" class="view">
+            <div class="container">
+                <header>
+                    <h1>👥 Users</h1>
+                    <p class="subtitle">Manage users and assignees</p>
+                </header>
+
+                <div class="add-task-section">
+                    <h2>Add New User</h2>
+                    <form id="userForm">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <input 
+                                    type="text" 
+                                    id="userName" 
+                                    placeholder="Full Name *" 
+                                    required
+                                    autocomplete="off"
+                                >
+                            </div>
+                            <div class="form-group">
+                                <input 
+                                    type="email" 
+                                    id="userEmail" 
+                                    placeholder="Email *" 
+                                    required
+                                    autocomplete="off"
+                                >
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <input 
+                                type="text" 
+                                id="userDepartment" 
+                                placeholder="Department (optional)"
+                                autocomplete="off"
+                            >
+                        </div>
+                        <button type="submit" class="btn btn-primary">
+                            <span>➕</span> Add User
+                        </button>
+                    </form>
+                </div>
+
+                <div class="search-section">
+                    <h2>Filter Users</h2>
+                    <div class="search-controls">
+                        <input 
+                            type="text" 
+                            id="userSearchQuery" 
+                            placeholder="Search users..."
+                            autocomplete="off"
+                        >
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="onlyActiveUsers" checked>
+                            <span>Show only active users</span>
+                        </label>
+                        <button id="userSearchBtn" class="btn btn-secondary">🔍 Search</button>
+                        <button id="clearUserSearchBtn" class="btn btn-secondary">✖️ Clear</button>
+                    </div>
+                </div>
+
+                <div class="tasks-section">
+                    <div class="tasks-header">
+                        <h2>Users</h2>
+                        <span id="userCount" class="task-count">0 users</span>
+                    </div>
+                    <div id="usersList" class="tasks-list">
+                        <div class="loading">Loading users...</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- End Users View -->
     </div>
 
-    <!-- Edit Modal -->
+    <!-- Edit Task Modal -->
     <div id="editModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
@@ -130,11 +228,9 @@
                 <div class="form-row">
                     <div class="form-group">
                         <label for="editTaskAssignee">Assignee</label>
-                        <input 
-                            type="text" 
-                            id="editTaskAssignee" 
-                            autocomplete="off"
-                        >
+                        <select id="editTaskAssignee">
+                            <option value="">-- No Assignee --</option>
+                        </select>
                     </div>
                     <div class="form-group">
                         <label for="editTaskPriority">Priority</label>
@@ -171,6 +267,55 @@
                 <div class="modal-actions">
                     <button type="submit" class="btn btn-primary">💾 Save Changes</button>
                     <button type="button" class="btn btn-secondary" onclick="closeEditModal()">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Edit User Modal -->
+    <div id="editUserModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Edit User</h3>
+                <button class="close-btn" onclick="closeEditUserModal()">&times;</button>
+            </div>
+            <form id="editUserForm">
+                <input type="hidden" id="editUserId">
+                <div class="form-group">
+                    <label for="editUserName">Name *</label>
+                    <input 
+                        type="text" 
+                        id="editUserName" 
+                        required
+                        autocomplete="off"
+                    >
+                </div>
+                <div class="form-group">
+                    <label for="editUserEmail">Email *</label>
+                    <input 
+                        type="email" 
+                        id="editUserEmail" 
+                        required
+                        autocomplete="off"
+                    >
+                </div>
+                <div class="form-group">
+                    <label for="editUserDepartment">Department</label>
+                    <input 
+                        type="text" 
+                        id="editUserDepartment" 
+                        autocomplete="off"
+                    >
+                </div>
+                <div class="form-group">
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="editUserActive">
+                        <span>Active User</span>
+                    </label>
+                </div>
+                <div class="modal-actions">
+                    <button type="submit" class="btn btn-primary">💾 Save Changes</button>
+                    <button type="button" class="btn btn-secondary" onclick="closeEditUserModal()">Cancel</button>
                 </div>
             </form>
         </div>
