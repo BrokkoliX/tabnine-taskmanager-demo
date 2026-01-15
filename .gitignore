@@ -21,6 +21,9 @@ package-lock.json
 .env
 .env.local
 
+# MCP Servers (contains API tokens and secrets)
+.tabnine/mcp_servers.json
+
 # OS
 .DS_Store
 Thumbs.db

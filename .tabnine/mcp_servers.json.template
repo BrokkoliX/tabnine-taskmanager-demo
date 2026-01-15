@@ -1,0 +1,37 @@
+{
+  "mcpServers": {
+    "sqlite-taskmanager": {
+      "command": "node",
+      "args": [
+        "/path/to/mcp-sqlite-server/index.js"
+      ],
+      "env": {}
+    },
+    "snyk-security": {
+      "command": "node",
+      "args": [
+        "/path/to/mcp-snyk-server/index.js"
+      ],
+      "env": {
+        "SNYK_TOKEN": "your-snyk-token-here",
+        "PROJECT_PATH": "/path/to/your/project"
+      }
+    },
+    "azure-devops": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@azure-devops/mcp",
+        "your-org-name",
+        "--authentication",
+        "envvar",
+        "--domains",
+        "all"
+      ],
+      "env": {
+        "AZURE_DEVOPS_PAT": "your-azure-devops-pat-here",
+        "ADO_MCP_AUTH_TOKEN": "your-azure-devops-pat-here"
+      }
+    }
+  }
+}
